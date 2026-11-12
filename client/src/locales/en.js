@@ -6,6 +6,7 @@ export default {
     orders: 'Orders',
     finance: 'Finance',
     demandForecast: 'Demand Forecast',
+    restocking: 'Restocking',
     companyName: 'Catalyst Components',
     subtitle: 'Inventory Management System'
   },
@@ -112,7 +113,12 @@ export default {
     onTimeDelivery: 'On-Time Delivery',
     itemsCount: '{count} items',
     quantity: 'Qty',
+    submittedOrders: 'Submitted Orders',
+    submittedOrdersEmpty: 'No restocking orders have been submitted yet.',
     table: {
+      leadTime: 'Lead Time',
+      submitted: 'Submitted',
+      total: 'Total',
       orderNumber: 'Order Number',
       orderId: 'Order ID',
       orderDate: 'Order Date',
@@ -127,6 +133,34 @@ export default {
       expectedDelivery: 'Expected Delivery',
       actualDelivery: 'Actual Delivery'
     }
+  },
+
+  // Restocking
+  restocking: {
+    title: 'Restocking',
+    description: 'Plan purchases of recommended inventory within a budget',
+    budget: 'Budget',
+    budgetLabel: 'Restocking budget',
+    recommendedSpend: 'Recommended Spend',
+    remaining: 'Remaining',
+    recommendedItems: 'Recommended Items',
+    table: {
+      sku: 'SKU',
+      name: 'Item',
+      trend: 'Trend',
+      quantity: 'Quantity',
+      unitCost: 'Unit Cost',
+      lineCost: 'Line Cost',
+      leadTime: 'Lead Time (days)'
+    },
+    empty: 'No items fit within this budget. Increase the budget to see recommendations.',
+    days: '{count} days',
+    placeOrder: 'Place Order',
+    submitting: 'Submitting...',
+    orderPlaced: 'Order {orderNumber} placed',
+    orderPlacedDetail: 'Expected delivery in {days} days.',
+    loadError: 'Failed to load recommendations',
+    submitError: 'Failed to place order'
   },
 
   // Finance/Spending

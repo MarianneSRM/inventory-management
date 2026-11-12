@@ -75,6 +75,44 @@
         </div>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">{{ t('orders.submittedOrders') }} ({{ submittedOrders.length }})</h3>
+      </div>
+      <div v-if="submittedError" class="error">{{ submittedError }}</div>
+      <div v-else-if="submittedOrders.length === 0" class="submitted-empty">
+        {{ t('orders.submittedOrdersEmpty') }}
+      </div>
+      <div v-else class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>{{ t('orders.table.orderNumber') }}</th>
+              <th>{{ t('orders.table.items') }}</th>
+              <th>{{ t('orders.table.total') }}</th>
+              <th>{{ t('orders.table.submitted') }}</th>
+              <th>{{ t('orders.table.leadTime') }}</th>
+              <th>{{ t('orders.table.expectedDelivery') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="order in submittedOrders" :key="order.id">
+              <td><strong>{{ order.order_number }}</strong></td>
+              <td>
+                <div v-for="item in order.items" :key="item.sku" class="submitted-item">
+                  {{ translateProductName(item.name) }} x {{ item.quantity }}
+                </div>
+              </td>
+              <td><strong>${{ Number(order.total_cost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</strong></td>
+              <td>{{ formatDate(order.submitted_at) }}</td>
+              <td>{{ t('restocking.days', { count: order.lead_time_days }) }}</td>
+              <td>{{ formatDate(order.expected_delivery) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -95,6 +133,8 @@ export default {
     const loading = ref(true)
     const error = ref(null)
     const orders = ref([])
+    const submittedOrders = ref([])
+    const submittedError = ref(null)
 
     // Use shared filters
     const {
@@ -145,6 +185,7 @@ export default {
 
     const formatDate = (dateString) => {
       const { currentLocale } = useI18n()
+      if (!dateString || isNaN(new Date(dateString).getTime())) return '-'
       const locale = currentLocale.value === 'ja' ? 'ja-JP' : 'en-US'
       return new Date(dateString).toLocaleDateString(locale, {
         year: 'numeric',
@@ -153,13 +194,27 @@ export default {
       })
     }
 
-    onMounted(loadOrders)
+    const loadSubmittedOrders = async () => {
+      try {
+        submittedOrders.value = await api.getRestockOrders()
+        submittedError.value = null
+      } catch (err) {
+        submittedError.value = 'Failed to load submitted orders: ' + err.message
+      }
+    }
+
+    onMounted(() => {
+      loadOrders()
+      loadSubmittedOrders()
+    })
 
     return {
       t,
       loading,
       error,
       orders,
+      submittedOrders,
+      submittedError,
       getOrdersByStatus,
       getOrderStatusClass,
       formatDate,
@@ -275,5 +330,16 @@ export default {
 .item-meta {
   font-size: 0.813rem;
   color: #64748b;
+}
+
+.submitted-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #64748b;
+  font-size: 0.938rem;
+}
+
+.submitted-item {
+  padding: 0.125rem 0;
 }
 </style>
